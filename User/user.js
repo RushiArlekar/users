@@ -1,47 +1,77 @@
 
-function appendphotos(data){
+function appendphotos(id){
   var maindiv = document.getElementById("gallerydiv");
   //maindiv.innerHTML=data;
 
-  jsongallery = JSON.parse(data);
-    
-    for (var i = 0; i < jsongallery.length; i++) {
+  //jsongallery = JSON.parse(data);
+  var src = "https://jsonplaceholder.typicode.com/photos?photoId="+id;
+  console.log(id);
+
+    maindiv.setAttribute("src",fetch(src)
+    .then(response => response.json())
+    .then(json => {
+      console.log(json)
+
 
       var gdiv = document.createElement('IMG');
-      gdiv.id = 'gdiv';
-      gdiv.setAttribute("width","320px");
-      gdiv.setAttribute("height","180px");
-      gdiv.setAttribute("src",fetch('https://jsonplaceholder.typicode.com/photos?photoId='+jsongallery[i].photoId+'&id='+jsongallery[i].id)
-      .then(response => response.json())
-      .then(json => {
-        //console.log(json)
+      gdiv.id = i;
+      gdiv.setAttribute("width","180px");
+      gdiv.setAttribute("height","90px");
 
-        photo = JSON.parse(json);
-        console.log(photo);
-        //maindiv.appendChild(gdiv);
-        var photos = `
-        <iframe width="180" height="90" 
-        src="${photo[i].thumbnailUrl}?frameborder=0">
-        </iframe>
-        
-        `
-        gdiv.appendChild(photos);
-      }));
-
-      //div.appendChild(document.create);
-      //gdiv.innerHTML=jsongallery[i].url;
+      //photo = JSON.parse(json);
+      //console.log(photo);
+      //maindiv.appendChild(gdiv);
+      var photos = `
+      <iframe width="180" height="90" 
+      src="${json[i].thumbnailUrl}?frameborder=0">
+      </iframe>
       
-      maindiv.appendChild(gdiv);
-  }
+      `
+      gdiv.innerHTML = photos;
+    }));
+    
+
+    //div.appendChild(document.create);
+    //gdiv.innerHTML=jsongallery[i].url;
+    
+    //maindiv.appendChild(gdiv);
+  
 
 }
 
-function displaygellery(id){
-  //console.log("yes "+id);
-  get('https://jsonplaceholder.typicode.com/photos?albumId='+id).then(function(response){
-    console.log("success",response);
-    //console.log(id);
-    appendphotos(response);
+function displaygellery(e){
+  var id = this.e;
+  console.log("yes "+this.id);
+  get('https://jsonplaceholder.typicode.com/photos?albumId='+this.id).then((response)=>{
+    console.log("success 1",response);
+
+    photo = JSON.parse(response);
+    var maindiv = document.getElementById("gallerydiv");
+    var src = 'https://jsonplaceholder.typicode.com/photos?albumId='+this.id;
+    //console.log("src"+src);
+
+    /*
+    if(maindiv.hasChildNodes()){
+        
+      for (var i = 0; i < photo.length; i++){
+        maindiv.removeChild(document.getElementById(i));
+      }
+    }
+    */
+
+    for (var i = 0; i < photo.length; i++){
+      var gdiv = document.createElement('img');
+      gdiv.id = i;
+      gdiv.setAttribute("width","150px");
+      gdiv.setAttribute("height","150px");
+
+      gdiv.setAttribute('src',photo[i].thumbnailUrl);
+      console.log("done "+i);
+
+      maindiv.appendChild(gdiv);
+
+    }
+
   },function(error){
     console.log("failed",error);
   })
@@ -55,24 +85,22 @@ function appendData(data) {
     for (var i = 0; i < jsondata.length; i++) {
 
       var div = document.createElement('div');
-      div.id = 'udiv';
-      div.className=jsondata[i].id;
+      div.className = 'udiv';
+      div.id=jsondata[i].id;
+      div.setAttribute("href",'https://jsonplaceholder.typicode.com/photos/'+jsondata[i].id);
       
-      div.setAttribute("type","button");
-      //div.appendChild(document.createTextNode(jsondata[i].name)); 
       div.innerHTML=jsondata[i].name;
       
       listdiv.appendChild(div);
+      div.addEventListener("click",displaygellery);
   }
-  var usr = document.getElementById('udiv');
-  //usr.addEventListener("onClick",displaygellery(usr.className));
-  usr.onclick = displaygellery(usr.className);
+  
 }
 
 function get(url) {
-  // Return a new promise.
+  
   return new Promise(function(resolve, reject) {
-    // Do the usual XHR stuff
+    
     var req = new XMLHttpRequest();
     req.open('GET', url);
 
